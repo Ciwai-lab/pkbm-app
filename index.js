@@ -23,6 +23,45 @@ const auth = (req, res, next) => {
   res.redirect('/login');
 };
 
+app.get('/', (req, res) => {
+  res.send(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>PKBM Ciwai - Pendaftaran Online</title>
+            <style>
+                body { font-family: sans-serif; background: #f4f4f4; text-align: center; padding: 50px; }
+                .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 400px; }
+                input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+                button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+                button:hover { background: #218838; }
+                .login-link { margin-top: 20px; display: block; color: #666; font-size: 12px; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h2>Pendaftaran Siswa Baru</h2>
+                <p>PKBM Ciwai - Masa Depan Lebih Cerah</p>
+                <form action="/daftar" method="POST">
+                    <input type="text" name="name" placeholder="Nama Lengkap" required>
+                    <input type="email" name="email" placeholder="Email Aktif" required>
+                    <input type="text" name="phone" placeholder="Nomor WhatsApp" required>
+                    <select name="program">
+                        <option value="Paket A">Paket A (SD)</option>
+                        <option value="Paket B">Paket B (SMP)</option>
+                        <option value="Paket C" selected>Paket C (SMA)</option>
+                    </select>
+                    <button type="submit">Daftar Sekarang</button>
+                </form>
+                <a href="/login" class="login-link">Portal Admin / Mentor</a>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
 // 1. Route Halaman Login
 app.get('/login', (req, res) => {
   res.send(`
