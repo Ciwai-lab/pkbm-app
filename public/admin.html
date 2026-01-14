@@ -1,36 +1,57 @@
 <!DOCTYPE html>
 <html lang="id">
 
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - PKBM Ciwai</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container">
-            <span class="navbar-brand">PKBM Ciwai Admin</span>
-            <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+<body class="bg-gray-100 pb-10">
+    <nav class="bg-blue-800 text-white p-4 shadow-lg mb-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Admin PKBM Ciwai (Singapore Server)</h1>
+            <a href="/" class="text-sm bg-blue-700 px-3 py-1 rounded">Logout</a>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3>Daftar Calon Siswa</h3>
-            <button class="btn btn-success" onclick="location.reload()">🔄 Refresh Data</button>
-        </div>
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Daftar Pendaftar Baru</h2>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Nama</th>
-                            <th>Program</th>
-                            <th>WhatsApp</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b">
+                            <th class="p-3 text-sm font-semibold text-gray-600">Nama Siswa</th>
+                            <th class="p-3 text-sm font-semibold text-gray-600">WhatsApp</th>
+                            <th class="p-3 text-sm font-semibold text-gray-600">Program</th>
+                            <th class="p-3 text-sm font-semibold text-gray-600">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -40,27 +61,128 @@
         </div>
     </div>
 
-    <script>
+    <div id="detailModal" class="modal">
+        <div class="modal-content shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="text-xl font-bold text-blue-800">Detail Lengkap Pendaftar</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 text-2xl">&times;</button>
+            </div>
+            <div id="modalBody" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            </div>
+            <div class="mt-8 flex justify-end">
+                <button onclick="closeModal()" class="bg-gray-200 px-6 py-2 rounded-lg font-bold">Tutup</button>
+            </div>
+        </div>
+    </div>
 
-        fetch('/api/registrations')
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.getElementById('tableBody');
-                tbody.innerHTML = '';
-                data.forEach(row => {
-                    tbody.innerHTML += `
-                <tr>
-                    <td>${row.name || 'Anonim'}</td>
-                    <td><span class="badge bg-info text-dark">${row.program || '-'}</span></td>
-                    <td><a href="https://wa.me/${row.phone}" target="_blank">${row.phone}</a></td>
-                    <td><span class="badge bg-warning">${row.status}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-primary">Edit</button>
-                        <button class="btn btn-sm btn-danger">Hapus</button>
-                    </td>
-                </tr>`;
-                });
+    <script>
+        async function loadData() {
+            const res = await fetch('/api/registrations');
+            const data = await res.json();
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(reg => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 font-medium">${reg.name}</td>
+                        <td class="p-3 text-blue-600 font-mono">${reg.phone}</td>
+                        <td class="p-3"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">${reg.program}</span></td>
+                        <td class="p-3">
+                            <button onclick='showDetail(${JSON.stringify(reg)})' class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Lihat Detail</button>
+                        </td>
+                    </tr>
+                `;
             });
+        }
+
+        function showDetail(reg) {
+            const modalBody = document.getElementById('modalBody');
+            const modal = document.getElementById('detailModal');
+
+            // 1. Bongkar data JSON dari kolom address
+            let detail = {};
+            try {
+                detail = JSON.parse(reg.address || '{}');
+            } catch (e) {
+                detail = {};
+            }
+
+            // 2. Gabungin data biar gampang dipanggil
+            const p = { ...reg, ...detail };
+
+            // 3. Susun tampilan modal (Data Siswa + Data Ortu + Tombol Aksi)
+            let html = `
+        <div class="md:col-span-2 bg-blue-50 p-2 font-bold text-blue-800 rounded">DATA SISWA</div>
+        <div><strong>NIK:</strong> ${p.nik || '-'}</div>
+        <div><strong>NISN:</strong> ${p.nisn || '-'}</div>
+        <div><strong>WhatsApp:</strong> ${p.phone || '-'}</div>
+        <div><strong>Email:</strong> ${p.email || '-'}</div>
+        <div><strong>Tempat/Tgl Lahir:</strong> ${p.tmp_lahir || '-'}, ${p.tgl_lahir || '-'}</div>
+        <div><strong>Alamat:</strong> ${p.alamat || '-'} RT ${p.rt || '0'}/${p.rw || '0'}</div>
+        <div><strong>Kel/Desa:</strong> ${p.desa || '-'}</div>
+        <div><strong>Program:</strong> <span class="bg-blue-100 px-2 py-1 rounded text-xs font-bold">${p.program}</span></div>
+        
+        <div class="md:col-span-2 bg-green-50 p-2 font-bold text-green-800 rounded mt-4">DATA ORANG TUA</div>
+        <div><strong>Ayah:</strong> ${p.ayah_nama || '-'} (${p.ayah_nik || '-'})</div>
+        <div><strong>Pekerjaan Ayah:</strong> ${p.ayah_kerja || '-'}</div>
+        <div><strong>Ibu:</strong> ${p.ibu_nama || '-'} (${p.ibu_nik || '-'})</div>
+        <div><strong>Pekerjaan Ibu:</strong> ${p.ibu_kerja || '-'}</div>
+
+        <div class="md:col-span-2 mt-6 pt-4 border-t">
+            ${p.status === 'approved' ? `
+                <div class="bg-gray-50 p-4 rounded-xl text-center border">
+                    <p class="text-xs font-bold text-blue-600 mb-2 font-mono">NOMOR REGISTRASI: ${p.reg_number}</p>
+                    <div class="flex justify-center mb-4"><svg id="barcode-admin"></svg></div>
+                    <button onclick="kirimWA('${p.phone}', '${p.name}', '${p.reg_number}')" 
+                        class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 shadow-lg">
+                        📱 Kirim Barcode via WhatsApp
+                    </button>
+                </div>
+            ` : `
+                <button onclick="approveSiswa('${p.id}')" 
+                    class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition-all">
+                    ✅ Approve & Generate Reg Code
+                </button>
+            `}
+        </div>
+    `;
+
+            modalBody.innerHTML = html;
+            modal.style.display = 'block';
+
+            // Munculin barcodenya kalo udah approved
+            if (p.reg_number) {
+                JsBarcode("#barcode-admin", p.reg_number, {
+                    height: 45,
+                    fontSize: 14,
+                    margin: 10
+                });
+            }
+        }
+
+        function kirimWA(hp, nama, reg) {
+            const formatHP = hp.startsWith('0') ? '62' + hp.slice(1) : hp;
+            const pesan = `Halo *${nama}*, Selamat! Pendaftaran anda di *PKBM Ciwai* sudah disetujui. %0A%0ANomor Registrasi anda: *${reg}*%0A%0ASilakan simpan nomor ini untuk absensi digital. Terima Kasih. by, Admin PKBM`;
+
+            const url = `https://wa.me/${formatHP}?text=${pesan}`;
+            window.open(url, '_blank');
+        }
+
+        async function approveSiswa(id) {
+            if (!confirm('Approve siswa ini bro?')) return;
+            const res = await fetch(`/api/approve/${id}`, { method: 'POST' });
+            if (res.ok) {
+                alert('Mantap! Reg Code sudah dibuat.');
+                location.reload(); // Refresh buat update tampilan
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        loadData();
     </script>
 </body>
 

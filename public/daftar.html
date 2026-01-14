@@ -4,97 +4,409 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendaftaran - PKBM Ciwai</title>
+    <title>Pendaftaran PKBM Ciwai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            text-align: center;
-            padding: 40px 20px;
+        .step-hidden {
+            display: none;
         }
 
-        .card {
-            background: white;
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-            width: 100%;
-            max-width: 450px;
-        }
-
-        h2 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        p {
-            color: #666;
-            margin-bottom: 25px;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 15px;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #218838;
-            transform: translateY(-2px);
-        }
-
-        .footer-link {
-            margin-top: 20px;
-            display: block;
-            color: #007bff;
-            text-decoration: none;
-            font-size: 13px;
+        .active-step {
+            border-bottom: 4px solid #2563eb;
+            color: #2563eb;
         }
     </style>
 </head>
 
-<body>
-    <div class="card">
-        <h2>Pendaftaran Siswa Baru</h2>
-        <p>PKBM Ciwai - Masa Depan Lebih Cerah</p>
+<body class="bg-gray-100 font-sans pb-10">
+    <div class="container mx-auto max-w-3xl p-4">
+        <div class="bg-white rounded-3xl shadow-xl mt-6 overflow-hidden">
+            <div class="flex border-b">
+                <div id="tab1" class="flex-1 text-center py-4 font-bold active-step">1. Data Siswa</div>
+                <div id="tab2" class="flex-1 text-center py-4 font-bold text-gray-400">2. Data Orang Tua</div>
+            </div>
 
-        <form action="/daftar" method="POST">
-            <input type="text" name="name" placeholder="Nama Lengkap" required>
-            <input type="email" name="email" placeholder="Email Aktif" required>
-            <input type="text" name="phone" placeholder="Nomor WhatsApp (Contoh: 0812...)" required>
+            <form action="/daftar" method="POST" class="p-6 md:p-10">
+                <div id="step1">
+                    <h3 class="text-xl font-bold mb-6 text-blue-800">Identitas Calon Siswa</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-bold">Nama Lengkap</label><input type="text" name="name"
+                                required
+                                class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-400">
+                        </div>
+                        <div><label class="block text-sm font-bold">NISN</label><input type="number" name="nisn"
+                                class="w-full border p-2 rounded-lg"></div>
+                        <div><label class="block text-sm font-bold">NIK</label><input type="number" name="nik" required
+                                class="w-full border p-2 rounded-lg"></div>
+                        <div>
+                            <label class="block text-sm font-bold">Jenis Kelamin</label>
+                            <select name="jk" class="w-full border p-2 rounded-lg">
+                                <option value="L">Laki-laki</option>
+                                <option value="P">Perempuan</option>
+                            </select>
+                        </div>
+                        <div><label class="block text-sm font-bold">Tempat Lahir</label><input type="text"
+                                name="tmp_lahir" class="w-full border p-2 rounded-lg"></div>
+                        <div><label class="block text-sm font-bold">Tanggal Lahir</label><input type="date"
+                                name="tgl_lahir" class="w-full border p-2 rounded-lg"></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-bold text-blue-600">Pilih Program
+                                (Rombel)</label>
+                            <select name="program" required
+                                class="w-full border-2 border-blue-400 p-2 rounded-lg font-bold">
+                                <option value="Paket A">Paket A (SD)</option>
+                                <option value="Paket B">Paket B (SMP)</option>
+                                <option value="Paket C">Paket C (SMA)</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <label style="display:block; text-align:left; font-size: 12px; color: #888; margin-top: 10px;">Pilih
-                Program:</label>
-            <select name="program">
-                <option value="Paket A">Paket A (Setara SD)</option>
-                <option value="Paket B">Paket B (Setara SMP)</option>
-                <option value="Paket C" selected>Paket C (Setara SMA)</option>
-            </select>
+                    <h3 class="text-xl font-bold mt-8 mb-4 text-blue-800">Alamat & Kontak</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-bold text-gray-700">Alamat Lengkap</label>
+                            <input type="text" name="alamat"
+                                class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                                placeholder="Jl. Contoh No. 123">
+                        </div>
 
-            <button type="submit">Daftar Sekarang</button>
-        </form>
+                        <div class="md:col-span-2"> <label class="block text-sm font-bold text-gray-700">RT / RW</label>
+                            <div class="flex gap-2">
+                                <input type="text" name="rt" placeholder="RT" class="w-1/2 border p-2 rounded-lg">
+                                <input type="text" name="rw" placeholder="RW" class="w-1/2 border p-2 rounded-lg">
+                            </div>
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-sm font-bold text-gray-700">Kode Pos</label>
+                            <input type="number" name="kodepos"
+                                class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                                placeholder="12345">
+                        </div>
 
-        <a href="/" class="footer-link">← Kembali ke Halaman Utama</a>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700">Provinsi</label>
+                            <select id="provinsi" name="provinsi" required
+                                class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400">
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700">Kota / Kabupaten</label>
+                            <select id="kota" name="kota" required
+                                class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                                disabled>
+                                <option value="">Pilih...</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700">Kecamatan</label>
+                            <select id="kecamatan" name="kecamatan" required
+                                class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                                disabled>
+                                <option value="">Pilih...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700">Kelurahan / Desa</label>
+                            <select id="kelurahan" name="desa" required
+                                class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                                disabled>
+                                <option value="">Pilih...</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-1">
+                            <label class="block text-sm font-bold text-gray-700">Nomor HP/WA</label>
+                            <input type="tel" name="phone" required
+                                class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                                placeholder="081234567xxx">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700">Email</label>
+                            <input type="email" name="email"
+                                class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                                placeholder="contoh@gmail.com">
+                        </div>
+                    </div> <button type="button" onclick="nextStep()"
+                        class="mt-8 w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-all">
+                        Lanjut ke Data Orang Tua →
+                    </button>
+                </div>
+
+                <div id="step2" class="step-hidden">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">Data Orang Tua</h3>
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 p-4 rounded-xl">
+                            <h4 class="font-bold text-blue-700 mb-2 border-b">Data Ayah</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-bold">Nama Ayah</label>
+                                    <input type="text" name="ayah_nama" placeholder="Nama Lengkap Ayah"
+                                        class="border p-2 rounded-lg w-full">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold">Tahun Lahir Ayah</label>
+                                    <input type="number" name="ayah_tahun_lahir" placeholder="Contoh: 1980"
+                                        class="border p-2 rounded-lg w-full">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold">Pendidikan Ayah</label>
+                                    <select name="ayah_pendidikan" class="border p-2 rounded-lg w-full">
+                                        <option value="">-- Pilih Pendidikan --</option>
+                                        <option value="SD">SD/Sederajat</option>
+                                        <option value="SMP">SMP/Sederajat</option>
+                                        <option value="SMA">SMA/Sederajat</option>
+                                        <option value="D3">D3</option>
+                                        <option value="S1">S1</option>
+                                        <option value="S2">S2/S3</option>
+                                        <option value="Tidak Sekolah">Tidak Sekolah</option>
+                                    </select>
+                                </div>
+
+                                <input type="text" name="ayah_kerja" placeholder="Pekerjaan Ayah"
+                                    class="border p-2 rounded-lg">
+                                <input type="number" name="ayah_nik" placeholder="NIK Ayah"
+                                    class="border p-2 rounded-lg">
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-xl mt-4">
+                            <h4 class="font-bold text-pink-700 mb-2 border-b">Data Ibu</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-bold">Nama Ibu</label>
+                                    <input type="text" name="ibu_nama" placeholder="Nama Lengkap Ibu"
+                                        class="border p-2 rounded-lg w-full">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold">Tahun Lahir Ibu</label>
+                                    <input type="number" name="ibu_tahun_lahir" placeholder="Contoh: 1985"
+                                        class="border p-2 rounded-lg w-full">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold">Pendidikan Ibu</label>
+                                    <select name="ibu_pendidikan" class="border p-2 rounded-lg w-full">
+                                        <option value="">-- Pilih Pendidikan --</option>
+                                        <option value="SD">SD/Sederajat</option>
+                                        <option value="SMP">SMP/Sederajat</option>
+                                        <option value="SMA">SMA/Sederajat</option>
+                                        <option value="D3">D3</option>
+                                        <option value="S1">S1</option>
+                                        <option value="S2">S2/S3</option>
+                                        <option value="Tidak Sekolah">Tidak Sekolah</option>
+                                    </select>
+                                </div>
+
+                                <input type="text" name="ibu_kerja" placeholder="Pekerjaan Ibu"
+                                    class="border p-2 rounded-lg">
+                                <input type="number" name="ibu_nik" placeholder="NIK Ibu" class="border p-2 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-10">
+                        <button type="button" onclick="prevStep()"
+                            class="flex-1 bg-gray-400 text-white font-bold py-4 rounded-xl hover:bg-gray-500 transition-all shadow-md">
+                            ← Kembali
+                        </button>
+                        <button type="button" onclick="showPreview()"
+                            class="flex-1 bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 transition-all">
+                            Kirim Pendaftaran ✅
+                        </button>
+                    </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function nextStep() {
+            document.getElementById('step1').classList.add('step-hidden');
+            document.getElementById('step2').classList.remove('step-hidden');
+            document.getElementById('tab1').classList.remove('active-step');
+            document.getElementById('tab1').classList.add('text-gray-400');
+            document.getElementById('tab2').classList.add('active-step');
+            window.scrollTo(0, 0);
+        }
+        function prevStep() {
+            document.getElementById('step2').classList.add('step-hidden');
+            document.getElementById('step1').classList.remove('step-hidden');
+            document.getElementById('tab2').classList.remove('active-step');
+            document.getElementById('tab1').classList.add('active-step');
+            window.scrollTo(0, 0);
+        }
+
+        // Script API Wilayah
+        const provSelect = document.getElementById('provinsi');
+        const kotaSelect = document.getElementById('kota');
+        const kecSelect = document.getElementById('kecamatan');
+        const kelSelect = document.getElementById('kelurahan');
+
+        // 1. Provinsi
+        fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json')
+            .then(res => res.json())
+            .then(data => {
+                provSelect.innerHTML = '<option value="">Pilih Provinsi</option>';
+                data.forEach(p => {
+                    let opt = document.createElement('option');
+                    opt.value = p.name;
+                    opt.dataset.id = p.id;
+                    opt.textContent = p.name;
+                    provSelect.appendChild(opt);
+                });
+            });
+
+        // 2. Kota
+        provSelect.onchange = (e) => {
+            const id = e.target.options[e.target.selectedIndex].dataset.id;
+            kotaSelect.disabled = !id;
+            kecSelect.disabled = true;
+            kelSelect.disabled = true;
+            if (!id) return;
+
+            fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${id}.json`)
+                .then(res => res.json())
+                .then(data => {
+                    kotaSelect.innerHTML = '<option value="">Pilih Kota/Kab</option>';
+                    data.forEach(k => {
+                        let opt = document.createElement('option');
+                        opt.value = k.name;
+                        opt.dataset.id = k.id;
+                        opt.textContent = k.name;
+                        kotaSelect.appendChild(opt);
+                    });
+                });
+        };
+
+        // 3. Kecamatan
+        kotaSelect.onchange = (e) => {
+            const id = e.target.options[e.target.selectedIndex].dataset.id;
+            kecSelect.disabled = !id;
+            kelSelect.disabled = true;
+            if (!id) return;
+
+            fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${id}.json`)
+                .then(res => res.json())
+                .then(data => {
+                    kecSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+                    data.forEach(k => {
+                        let opt = document.createElement('option');
+                        opt.value = k.name;
+                        opt.dataset.id = k.id;
+                        opt.textContent = k.name;
+                        kecSelect.appendChild(opt);
+                    });
+                });
+        };
+
+        // 4. Kelurahan
+        kecSelect.onchange = (e) => {
+            const id = e.target.options[e.target.selectedIndex].dataset.id;
+            kelSelect.disabled = !id;
+            if (!id) return;
+
+            fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/villages/${id}.json`)
+                .then(res => res.json())
+                .then(data => {
+                    kelSelect.innerHTML = '<option value="">Pilih Kelurahan/Desa</option>';
+                    data.forEach(k => {
+                        let opt = document.createElement('option');
+                        opt.value = k.name;
+                        opt.textContent = k.name;
+                        kelSelect.appendChild(opt);
+                    });
+                });
+        };
+
+        // Fungsi Preview
+        function showPreview() {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            let html = '<div class="space-y-2 border-t pt-4">';
+
+            const labels = {
+                name: "Nama Siswa",
+                nik: "NIK",
+                program: "Program",
+                phone: "WhatsApp",
+                desa: "Kelurahan/Desa",
+                ayah_nama: "Nama Ayah",
+                ibu_nama: "Nama Ibu"
+            };
+
+            formData.forEach((value, key) => {
+                if (value && value.trim() !== "" && key !== 'step') {
+                    let displayValue = value;
+
+                    if (key === 'jk') {
+                        displayValue = (value === 'L') ? 'Laki-laki' : 'Perempuan';
+                    }
+
+                    const label = labels[key] || key.replace(/_/g, ' ').toUpperCase();
+                    html += `
+            <div class="flex justify-between border-b pb-1">
+                <span class="text-gray-500 text-xs font-bold">${label}</span>
+                <span class="text-blue-800 font-semibold">${displayValue}</span>
+            </div>`;
+                }
+            });
+            html += '</div>';
+
+            document.getElementById('previewContent').innerHTML = html;
+            document.getElementById('previewModal').classList.remove('hidden');
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.add('hidden');
+        }
+
+        // Fungsi kirim
+        async function submitRealForm() {
+            const form = document.querySelector('form');
+            const btn = event.target;
+            btn.innerText = "Mengirim...";
+            btn.disabled = true;
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/daftar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json(); // Ambil data JSON dari server
+
+                if (response.ok && result.success) {
+                    window.location.href = '/sukses';
+                } else {
+                    // Tampilkan pesan error spesifik dari server
+                    alert('Waduh Gagal Bro! Pesannya: ' + (result.error || 'Masalah Server'));
+                    btn.innerText = "Coba Lagi";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Masalah Koneksi / Server Ngebul: ' + err.message);
+                btn.innerText = "Coba Lagi";
+                btn.disabled = false;
+            }
+        }
+    </script>
+
+    <div id="previewModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
+            <h3 class="text-2xl font-bold text-blue-800 mb-4 border-b pb-2">Konfirmasi Data Pendaftaran</h3>
+            <div id="previewContent" class="space-y-3 text-sm text-gray-700">
+            </div>
+            <div class="flex gap-4 mt-8">
+                <button onclick="closePreview()" class="flex-1 bg-gray-400 text-white font-bold py-3 rounded-xl">Periksa
+                    Kembali</button>
+                <button onclick="submitRealForm()"
+                    class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700">Data
+                    Sudah Benar ✅</button>
+            </div>
+        </div>
     </div>
 </body>
 
