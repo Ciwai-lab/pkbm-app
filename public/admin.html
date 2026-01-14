@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - PKBM Ciwai</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand">PKBM Ciwai Admin</span>
+            <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Daftar Calon Siswa</h3>
+            <button class="btn btn-success" onclick="location.reload()">🔄 Refresh Data</button>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nama</th>
+                            <th>Program</th>
+                            <th>WhatsApp</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        fetch('/api/registrations')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = '';
+                data.forEach(row => {
+                    tbody.innerHTML += `
+                <tr>
+                    <td>${row.name || 'Anonim'}</td>
+                    <td><span class="badge bg-info text-dark">${row.program || '-'}</span></td>
+                    <td><a href="https://wa.me/${row.phone}" target="_blank">${row.phone}</a></td>
+                    <td><span class="badge bg-warning">${row.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary">Edit</button>
+                        <button class="btn btn-sm btn-danger">Hapus</button>
+                    </td>
+                </tr>`;
+                });
+            });
+    </script>
+</body>
+
+</html>
