@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruang Belajar - PKBM Ciwai</title>
+    <link rel="stylesheet" href="/assets/style.css">
+    <style>
+        .modul-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .modul-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-bottom: 5px solid #3b82f6;
+            cursor: pointer;
+        }
+
+        .modul-card:hover {
+            background: #f8fafc;
+        }
+    </style>
+</head>
+
+<body class="home-page">
+    <div class="topbar">
+        <button onclick="location.href='/dashboard'">⬅ Balik ke Dashboard</button>
+        <span id="label-paket">Memuat materi...</span>
+    </div>
+
+    <div class="container">
+        <h2 id="judul-halaman">📖 Modul Pembelajaran</h2>
+        <div id="daftar-modul" class="modul-grid">
+        </div>
+    </div>
+
+    <script>
+        // Data Modul (Bisa ente pindahin ke Database nanti bro!)
+        const dataMateri = {
+            "Paket C": [
+                { mapel: "Bahasa Inggris", link: "https://link-modul-inggris-c.pdf" },
+                { mapel: "Ekonomi", link: "https://link-modul-ekonomi-c.pdf" },
+                { mapel: "Sosiologi", link: "https://link-modul-sosiologi-c.pdf" }
+            ],
+            "Paket B": [
+                { mapel: "Matematika", link: "https://link-modul-mtk-b.pdf" },
+                { mapel: "IPA", link: "https://link-modul-ipa-b.pdf" }
+            ],
+            "Paket A": [
+                { mapel: "Calistung", link: "https://link-modul-calistung-a.pdf" }
+            ]
+        };
+
+        fetch('/api/user-info')
+            .then(res => res.json())
+            .then(user => {
+                const paket = user.program; // Misal: "Paket C"
+                document.getElementById('label-paket').innerText = `Ruang Belajar ${paket}`;
+                document.getElementById('judul-halaman').innerText = `📖 Materi ${paket}`;
+
+                const listDiv = document.getElementById('daftar-modul');
+                const materiSesuai = dataMateri[paket] || [];
+
+                if (materiSesuai.length === 0) {
+                    listDiv.innerHTML = "<p>Materi belum tersedia buat paket ente bro.</p>";
+                    return;
+                }
+
+                materiSesuai.forEach(item => {
+                    const card = `
+                        <div class="modul-card" onclick="window.open('${item.link}', '_blank')">
+                            <span style="font-size:30px;">📗</span>
+                            <h3>${item.mapel}</h3>
+                            <p style="font-size:12px; color:blue;">Klik buat buka PDF</p>
+                        </div>
+                    `;
+                    listDiv.innerHTML += card;
+                });
+            });
+    </script>
+</body>
+
+</html>

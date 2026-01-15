@@ -1,0 +1,255 @@
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+const app = express();
+const session = require('express-session');
+
+// Database ciwai.db
+const db = new sqlite3.Database('./data/ciwai.db');
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Setup Session
+app.use(session({
+  secret: 'kunci-rahasia-ciwai',
+  resave: false,
+  saveUninitialized: true
+}));
+
+// Fungsi (Middleware)
+const isAdmin = (req, res, next) => {
+  if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'tutor')) {
+    return next();
+  }
+  res.redirect('/login');
+};
+
+const isSiswa = (req, res, next) => {
+  if (req.session.user && req.session.user.role === 'siswa') return next();
+  res.redirect('/login');
+};
+
+// Pasang di route masing-masing
+app.get('/admin/dashboard', isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin.html'));
+});
+
+app.get('/ruangujian', isSiswa, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html')); // File Ruang Ujian ente
+});
+
+app.use(express.static('public'));
+
+// --- ROUTES HALAMAN (VIEW) ---
+
+app.get('/', (req, res) => {
+  // Kalau udah login, lempar ke dashboard ruangan
+  if (req.session.user) {
+    if (req.session.user.role === 'siswa') {
+      return res.redirect('/dashboard');
+    } else {
+      return res.redirect('/admin/dashboard');
+    }
+  }
+  // Kalau belum login, kasih liat halaman pendaftaran (file rename-an tadi)
+  res.sendFile(path.join(__dirname, 'public/home.html'));
+});
+
+// Tambahin route baru buat manggil dashboard.html
+app.get('/dashboard', isSiswa, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/dashboard.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/login.html'));
+});
+
+app.get('/daftar-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/daftar.html'));
+});
+
+// --- LOGIKA LOGIN/LOGOUT ---
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // 1. Pintu Pertama: Cek Tabel Users (Admin/Tutor)
+  db.get("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], (err, user) => {
+    if (user) {
+      req.session.user = { id: user.id, username: user.username, role: user.role };
+      return res.redirect('/admin/dashboard');
+    }
+
+    // 2. Pintu Kedua: Cek Tabel Registrations (Warga Belajar/Siswa)
+    // Username = No. Registrasi (REG...), Password = Password Custom atau No. Registrasi
+    db.get(`SELECT * FROM registrations 
+            WHERE reg_number = ? 
+            AND (password = ? OR (password IS NULL AND reg_number = ?)) 
+            AND status = 'approved'`,
+      [username, password, password], (err, siswa) => {
+        if (err || !siswa) {
+          return res.send("<script>alert('Login Gagal! Cek No.Regis/Password atau hubungi Admin.'); window.location='/login';</script>");
+        }
+
+        // Set session buat Siswa
+        req.session.user = {
+          id: siswa.id,
+          username: siswa.name,
+          role: 'siswa',
+          reg_number: siswa.reg_number,
+          program: siswa.program
+        };
+        res.redirect('/dashboard');
+      });
+  });
+});
+
+app.get('/api/user-info', (req, res) => {
+  if (req.session.user) {
+    res.json(req.session.user);
+  } else {
+    res.status(401).json({ error: "Belum login bro" });
+  }
+});
+
+// Logika Forum Diskusi
+app.post('/api/discussions', isSiswa, (req, res) => {
+  const { message } = req.body;
+  const { username, program, id } = req.session.user;
+  db.run(`INSERT INTO discussions (user_id, username, program, message) VALUES (?, ?, ?, ?)`,
+    [id, username, program, message], function (err) {
+      res.json({ status: 'success' });
+    });
+});
+
+app.get('/api/discussions', isSiswa, (req, res) => {
+  const program = req.session.user.program;
+  db.all(`SELECT * FROM discussions WHERE program = ? ORDER BY timestamp DESC LIMIT 50`, [program], (err, rows) => {
+    res.json(rows);
+  });
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
+  });
+});
+
+// --- LOGIKA DATABASE (API) ---
+
+app.post('/daftar', (req, res) => {
+  const { name, phone, program, ...rest } = req.body;
+  const detailData = JSON.stringify(rest);
+
+  // STEP 1: Masukin data utama dulu
+  const sql = `INSERT INTO registrations (name, phone, program, status, address) VALUES (?, ?, ?, 'pending', ?)`;
+
+  db.run(sql, [name, phone, program, detailData], function (err) {
+    if (err) {
+      console.error("Gagal Simpan:", err.message);
+      return res.status(500).json({ success: false, error: err.message });
+    }
+
+    // STEP 2: Ambil ID yang baru masuk (lastID)
+    const d = new Date();
+    const dateStr = d.getFullYear().toString() +
+      (d.getMonth() + 1).toString().padStart(2, '0') +
+      d.getDate().toString().padStart(2, '0');
+
+    // Format rapet buat Barcode: REG20260114001
+    const regNumber = `REG${dateStr}${this.lastID.toString().padStart(3, '0')}`;
+
+    // STEP 3: Update nomor registrasinya
+    db.run("UPDATE registrations SET reg_number = ? WHERE id = ?", [regNumber, this.lastID], (updateErr) => {
+      if (updateErr) {
+        console.error("Gagal Update No Reg:", updateErr.message);
+        return res.status(500).json({ success: false, error: "Gagal bikin Nomor Registrasi" });
+      }
+
+      // STEP 4: Kirim respon sukses beneran
+      res.status(200).json({
+        success: true,
+        reg_number: regNumber
+      });
+    });
+  });
+});
+
+// --- ROUTES ADMIN & LAINNYA ---
+
+app.get('/admin/dashboard', isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin.html'));
+});
+
+app.get('/api/registrations', (req, res) => {
+  db.all("SELECT * FROM registrations ORDER BY id DESC", [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const dataLengkap = rows.map(row => {
+      try {
+        const extra = JSON.parse(row.address);
+        return { ...row, ...extra };
+      } catch (e) { return row; }
+    });
+    res.json(dataLengkap);
+  });
+});
+
+app.post('/api/approve/:id', isAdmin, (req, res) => {
+  const id = req.params.id;
+  const d = new Date();
+  const dateStr = d.getFullYear().toString() +
+    (d.getMonth() + 1).toString().padStart(2, '0') +
+    d.getDate().toString().padStart(2, '0');
+
+  // Format rapet: REG + TANGGAL + ID
+  const regNumber = `REG${dateStr}${id.padStart(3, '0')}`;
+
+  db.run("UPDATE registrations SET status = 'approved', reg_number = ? WHERE id = ?",
+    [regNumber, id], function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ success: true, reg_number: regNumber });
+    });
+});
+
+app.get('/sukses', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/sukses.html'));
+});
+
+// API Ganti Password Mandiri
+app.post('/api/update-password', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ success: false, message: "Login dulu bro!" });
+
+  const { newPassword } = req.body;
+  const userId = req.session.user.id;
+  const role = req.session.user.role;
+
+  let sql = (role === 'siswa')
+    ? "UPDATE registrations SET password = ? WHERE id = ?"
+    : "UPDATE users SET password = ? WHERE id = ?";
+
+  db.run(sql, [newPassword, userId], (err) => {
+    if (err) return res.status(500).json({ success: false, error: err.message });
+    res.json({ success: true, message: "Password berhasil diupdate!" });
+  });
+});
+
+// Logika ruang ujian
+app.get('/ruang-ujian-list', isSiswa, (req, res) => {
+  // Kita arahin ke file index.html yang isinya daftar mata pelajaran
+  res.sendFile(path.join(__dirname, 'public/ruang_ujian_mapel.html'));
+});
+
+app.get('/ruang-belajar', isSiswa, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/belajar.html'));
+});
+
+app.get('/forum', isSiswa, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/forum.html'));
+});
+
+// app.listen
+app.listen(3001, () => {
+  console.log('Server PKBM Sat-Set jalan di port 3001 🚀');
+});

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard Warga Belajar - PKBM Ciwai</title>
+    <link rel="stylesheet" href="/assets/style.css">
+    <style>
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .menu-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .menu-card i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .bg-belajar {
+            border-top: 5px solid #3b82f6;
+        }
+
+        .bg-ujian {
+            border-top: 5px solid #ef4444;
+        }
+
+        .bg-diskusi {
+            border-top: 5px solid #10b981;
+        }
+    </style>
+</head>
+
+<body class="home-page">
+    <div class="topbar">
+        <span>Halo, Warga Belajar! 👋</span>
+        <button onclick="location.href='/logout'">Keluar ⎋</button>
+    </div>
+
+    <div class="container">
+        <div style="margin-top:20px;">
+            <h2 style="color:#1e293b;">Selamat Datang di Sekolah Digital</h2>
+            <p style="color:#64748b; font-size:14px;">Pilih ruangan yang ingin ente masuki bro:</p>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-card bg-belajar" onclick="location.href='/ruang-belajar'">
+                <span>📖</span>
+                <h3>Ruang Belajar</h3>
+                <p style="font-size:12px; color:#94a3b8;">Materi & Modul</p>
+            </div>
+
+            <div class="menu-card bg-ujian" onclick="location.href='/ruang-ujian-list'">
+                <span>📝</span>
+                <h3>Ruang Ujian</h3>
+                <p style="font-size:12px; color:#94a3b8;">Ujian & Quiz</p>
+            </div>
+
+            <div class="menu-card bg-diskusi" onclick="location.href='/forum'">
+                <span>💬</span>
+                <h3>Ruang Diskusi</h3>
+                <p style="font-size:12px; color:#94a3b8;">Forum Kelas</p>
+            </div>
+        </div>
+
+        <button onclick="showModal()"
+            style="margin-top:30px; width:100%; padding:12px; border-radius:10px; background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; font-weight:600;">
+            ⚙️ Pengaturan Akun (Ganti Password)
+        </button>
+    </div>
+
+    <script>
+        // Cek login
+        if (!localStorage.getItem("login") && !document.cookie.includes('connect.sid')) {
+            // location.href = "/login"; 
+        }
+
+        function showModal() {
+            const p = prompt("Masukkan password baru ente:");
+            if (p) {
+                fetch('/api/update-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newPassword: p })
+                }).then(res => res.json()).then(data => alert(data.message));
+            }
+        }
+
+        fetch('/api/user-info')
+            .then(res => res.json())
+            .then(user => {
+                if (user.program) {
+                    // Ganti tulisan "Halo, Warga Belajar!" jadi ada Paketnya
+                    document.querySelector('.topbar span').innerText = `Halo, Warga Belajar ${user.program}! 👋`;
+
+                    // Ganti judul di tengah
+                    document.querySelector('h2').innerText = `Selamat Datang di Sekolah Digital (${user.program})`;
+                }
+            });
+    </script>
+</body>
+
+</html>

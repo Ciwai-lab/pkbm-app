@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Ujian - PKBM Ciwai</title>
+    <link rel="stylesheet" href="/assets/style.css">
+    <style>
+        .mapel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .mapel-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            border-left: 8px solid #ef4444;
+            /* Warna Ruang Ujian */
+        }
+
+        .btn-mulai {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: #ef4444;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="home-page">
+    <div class="topbar">
+        <button onclick="location.href='/dashboard'">⬅ Kembali ke Dashboard</button>
+        <span>Ruang Ujian Aktif</span>
+    </div>
+
+    <div class="container">
+        <div class="mapel-grid">
+            <div class="mapel-card">
+                <h3>🇬🇧 Bahasa Inggris</h3>
+                <p style="font-size: 13px; color: #666;">Durasi: 60 Menit</p>
+                <p style="font-size: 13px; color: #666;">Status: Terbuka</p>
+                <a href="/inggris.html" class="btn-mulai">Mulai Ujian</a>
+            </div>
+
+            <div class="mapel-card">
+                <h3>🧮 Matematika</h3>
+                <p style="font-size: 13px; color: #666;">Durasi: 90 Menit</p>
+                <p style="font-size: 13px; color: #666;">Status: Belum Dibuka</p>
+                <a href="#" class="btn-mulai" style="background:#ccc; cursor:not-allowed;">Belum Tersedia</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Data Daftar Ujian per Paket
+        const daftarUjian = {
+            "Paket C": [
+                { mapel: "Bahasa Inggris", link: "/inggris.html", durasi: "60 Menit" },
+                { mapel: "Ekonomi", link: "/ekonomi.html", durasi: "90 Menit" }
+            ],
+            "Paket B": [
+                { mapel: "Matematika B", link: "/mtk-b.html", durasi: "90 Menit" }
+            ],
+            "Paket A": [
+                { mapel: "IPA A", link: "/ipa-a.html", durasi: "45 Menit" }
+            ]
+        };
+
+        fetch('/api/user-info')
+            .then(res => res.json())
+            .then(user => {
+                const paket = user.program; // Ambil info Paket A/B/C dari session
+                document.querySelector('.topbar span').innerText = `Ruang Ujian ${paket}`;
+
+                const grid = document.querySelector('.mapel-grid');
+                grid.innerHTML = ""; // Bersihin contoh yang tadi
+
+                const ujianTersedia = daftarUjian[paket] || [];
+
+                if (ujianTersedia.length === 0) {
+                    grid.innerHTML = "<p>Belum ada jadwal ujian buat paket ente bro.</p>";
+                    return;
+                }
+
+                ujianTersedia.forEach(u => {
+                    const card = `
+                    <div class="mapel-card">
+                        <h3>${u.mapel}</h3>
+                        <p style="font-size: 13px; color: #666;">Durasi: ${u.durasi}</p>
+                        <a href="${u.link}" class="btn-mulai">Mulai Ujian</a>
+                    </div>
+                `;
+                    grid.innerHTML += card;
+                });
+            });
+    </script>
+</body>
+
+</html>
