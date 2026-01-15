@@ -96,8 +96,15 @@ app.get('/api/registrations', isAdmin, (req, res) => {
 
 app.post('/api/update-password', (req, res) => {
   const { newPassword } = req.body;
-  const sql = (req.session.user.role === 'siswa') ? "UPDATE registrations SET password = ? WHERE id = ?" : "UPDATE users SET password = ? WHERE id = ?";
-  db.run(sql, [newPassword, req.session.user.id], () => res.json({ success: true }));
+  const sql = (req.session.user.role === 'siswa')
+    ? "UPDATE registrations SET password = ? WHERE id = ?"
+    : "UPDATE users SET password = ? WHERE id = ?";
+
+  db.run(sql, [newPassword, req.session.user.id], (err) => {
+    if (err) return res.status(500).json({ success: false, message: "Gagal update password bro!" });
+
+    res.json({ success: true, message: "Password berhasil diupdate!" });
+  });
 });
 
 // 5. LISTEN
