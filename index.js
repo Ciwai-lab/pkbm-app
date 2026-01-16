@@ -13,12 +13,13 @@ app.use(express.static('public')); // Asset static (CSS, JS, Images)
 app.use(session({
   secret: 'kunci-rahasia-ciwai',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: { secure: false }
 }));
 
 // 2. MIDDLEWARE (SATUR SECURITY)
 const isAdmin = (req, res, next) => {
-  if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'tutor')) return next();
+  if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'mentor')) return next();
   res.redirect('/login');
 };
 
@@ -51,17 +52,32 @@ app.get('/admin/dashboard', isAdmin, (req, res) => res.sendFile(path.join(__dirn
 // --- Auth API ---
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
-  // Cek Admin/Tutor
+
+  // 1. Cek Admin atau Mentor (Tutor)
   db.get("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], (err, user) => {
     if (user) {
-      req.session.user = { id: user.id, username: user.username, role: user.role };
+
+      req.session.user = {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        full_name: user.full_name,
+        program: user.program
+      };
       return res.redirect('/admin/dashboard');
     }
-    // Cek Siswa
+
+    // 2. Cek Siswa (Tetep sama)
     db.get(`SELECT * FROM registrations WHERE reg_number = ? AND (password = ? OR (password IS NULL AND reg_number = ?)) AND status = 'approved'`,
       [username, password, password], (err, siswa) => {
         if (err || !siswa) return res.send("<script>alert('Login Gagal!'); window.location='/login';</script>");
-        req.session.user = { id: siswa.id, name: siswa.name, role: 'siswa', reg_number: siswa.reg_number, program: siswa.program };
+        req.session.user = {
+          id: siswa.id,
+          name: siswa.name,
+          role: 'siswa',
+          reg_number: siswa.reg_number,
+          program: siswa.program
+        };
         res.redirect('/dashboard');
       });
   });
@@ -106,6 +122,107 @@ app.post('/api/update-password', (req, res) => {
 
     res.json({ success: true, message: "Password berhasil diupdate!" });
   });
+});
+
+// Route khusus Admin buat bikin akun Tutor
+app.post('/api/create-tutor', (req, res) => {
+  console.log("=== DEBUG CREATE TUTOR ===");
+
+  if (!req.session.user) {
+    return res.status(401).json({ message: 'Login dulu bro!' });
+  }
+
+  console.log("User di Session:", req.session.user.username);
+  console.log("Role di Session:", req.session.user.role);
+
+  if (req.session.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Ente bukan Admin bro! Role ente cuma: ' + req.session.user.role });
+  }
+
+  const { username, password, program, fullName } = req.body;
+  const role = 'mentor';
+
+  const query = `INSERT INTO users (username, password, role, program, full_name) VALUES (?, ?, ?, ?, ?)`;
+  db.run(query, [username, password, role, program, fullName], (err) => {
+    if (err) {
+      console.log("DETEKSI ERROR SQLITE:", err.message);
+      return res.status(500).json({ message: 'Gagal bro! Detail: ' + err.message });
+    }
+    res.json({ message: 'Akun Tutor ' + fullName + ' berhasil dibuat!' });
+  });
+});
+
+// API buat Mentor ambil daftar siswa per paket
+app.get('/api/mentor/siswa', isAdmin, (req, res) => {
+  const { role, program } = req.session.user;
+
+  // Kalau Admin, boleh liat semua. Kalau Mentor, cuma paketnya dia.
+  let query = "SELECT id, name, reg_number, program, status FROM registrations";
+  let params = [];
+
+  if (role === 'mentor') {
+    query += " WHERE program = ? AND status = 'approved'";
+    params.push(program);
+  }
+
+  db.all(query, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: "Gagal ambil data siswa" });
+    res.json(rows);
+  });
+});
+
+// API Mentor buat simpan/update materi
+app.post('/api/save-material', isAdmin, (req, res) => {
+  const { subject, module_link, exam_link } = req.body;
+  const { program } = req.session.user;
+
+  // Cek dulu, udah ada belum mapelnya di paket itu?
+  db.get("SELECT id FROM materials WHERE program = ? AND subject = ?", [program, subject], (err, row) => {
+    if (row) {
+      // Kalau ada, UPDATE
+      db.run("UPDATE materials SET module_link = ?, exam_link = ? WHERE id = ?",
+        [module_link, exam_link, row.id], () => res.json({ message: "Materi " + subject + " berhasil diupdate!" }));
+    } else {
+      // Kalau belum ada, INSERT
+      db.run("INSERT INTO materials (program, subject, module_link, exam_link) VALUES (?, ?, ?, ?)",
+        [program, subject, module_link, exam_link], () => res.json({ message: "Materi " + subject + " berhasil ditambah!" }));
+    }
+  });
+});
+
+// API buat Siswa ambil materi berdasarkan paket mereka
+app.get('/api/student/materials', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ message: 'Login dulu bro!' });
+
+  const user = req.session.user;
+  const role = user.role.toLowerCase();
+
+  if (role === 'tutor' || role === 'mentor' || role === 'admin') {
+    db.all("SELECT * FROM materials", [], (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    });
+  } else {
+
+    db.all("SELECT * FROM materials WHERE program = ?", [user.program], (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    });
+  }
+});
+
+// Endpoint buat hapus materi
+app.delete('/api/materials/:id', isAdmin, (req, res) => {
+  const { id } = req.params;
+  const db = new sqlite3.Database('./data/ciwai.db');
+
+  db.run("DELETE FROM materials WHERE id = ?", [id], function (err) {
+    if (err) {
+      return res.status(500).json({ message: "Gagal hapus di database!" });
+    }
+    res.json({ message: "Materi berhasil dihapus, Bro!" });
+  });
+  db.close();
 });
 
 // 5. LISTEN

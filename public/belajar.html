@@ -67,66 +67,56 @@
     </div>
 
     <script>
-        const dataMateri = {
-            "Paket C": [
-                { mapel: "Bahasa Inggris", icon: "fa-language", color: "blue" },
-                { mapel: "Ekonomi", icon: "fa-chart-line", color: "emerald" },
-                { mapel: "Sosiologi", icon: "fa-users", color: "purple" },
-                { mapel: "Geografi", icon: "fa-earth-asia", color: "orange" }
-            ],
-            "Paket B": [
-                { mapel: "Matematika", icon: "fa-calculator", color: "red" },
-                { mapel: "IPA", icon: "fa-microscope", color: "cyan" },
-                { mapel: "IPS", icon: "fa-people-group", color: "amber" }
-            ],
-            "Paket A": [
-                { mapel: "Calistung", icon: "fa-pen-clip", color: "pink" },
-                { mapel: "PKn", icon: "fa-flag", color: "red" }
-            ]
-        };
-
+        // 1. Ambil data user pas halaman di-load
         fetch('/api/user-info')
             .then(res => res.json())
             .then(user => {
-                const paket = user.program || "Paket C";
+                const paket = user.program || "Paket Belajar";
                 document.getElementById('label-paket').innerText = `Belajar ${paket}`;
                 document.getElementById('judul-halaman').innerText = `📖 Materi ${paket}`;
 
-                const listDiv = document.getElementById('daftar-modul');
-                const materiSesuai = dataMateri[paket] || [];
+                // 2. Jalankan fungsi ambil data materi dari DB
+                loadMateriSiswa();
+            });
 
-                if (materiSesuai.length === 0) {
-                    listDiv.innerHTML = `
-                        <div class="col-span-full bg-white p-10 rounded-3xl text-center border-2 border-dashed border-slate-200">
-                            <p class="text-slate-500 font-medium text-sm">Waduh, materi belum diupload admin bro! Coba tagih wkwk.</p>
-                        </div>
-                    `;
-                    return;
-                }
+        function loadMateriSiswa() {
+            fetch('/api/student/materials')
+                .then(res => res.json())
+                .then(data => {
+                    const listDiv = document.getElementById('daftar-modul');
 
-                listDiv.innerHTML = '';
-                materiSesuai.forEach(item => {
-                    const card = `
-                        <div class="modul-card group bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 cursor-pointer hover:shadow-xl hover:border-blue-200" 
-                             onclick="window.open('https://link-modul-contoh.pdf', '_blank')">
+                    if (!data || data.length === 0) {
+                        listDiv.innerHTML = `
+                            <div class="col-span-full bg-white p-10 rounded-3xl text-center border-2 border-dashed border-slate-200">
+                                <p class="text-slate-500 font-medium text-sm">Belum ada materi dari tutor nih, Bro. Coba tagih! wkwk.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Render data dari SQLite
+                    listDiv.innerHTML = data.map(m => `
+                        <div class="modul-card group bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 cursor-pointer hover:shadow-xl hover:border-blue-200">
                             <div class="flex items-center gap-5">
-                                <div class="w-16 h-16 bg-${item.color}-100 text-${item.color}-600 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-${item.color}-600 group-hover:text-white transition-all duration-300">
-                                    <i class="fa-solid ${item.icon}"></i>
+                                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                                    <i class="fa-solid fa-book-open"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">${item.mapel}</h3>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded uppercase font-bold tracking-tighter">Modul PDF</span>
-                                        <i class="fa-solid fa-circle-check text-blue-500 text-[10px]"></i>
+                                    <h3 class="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">${m.subject}</h3>
+                                    <div class="flex gap-2 mt-3">
+                                        <a href="${m.module_link}" target="_blank" class="text-[10px] bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold uppercase transition-all">Modul PDF</a>
+                                        <a href="${m.exam_link}" target="_blank" class="text-[10px] bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-bold uppercase transition-all">Mulai Ujian</a>
                                     </div>
                                 </div>
-                                <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all"></i>
                             </div>
                         </div>
-                    `;
-                    listDiv.innerHTML += card;
+                    `).join('');
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                    document.getElementById('daftar-modul').innerHTML = `<p class="text-center text-red-500">Gagal ambil data bro!</p>`;
                 });
-            });
+        }
     </script>
 </body>
 
