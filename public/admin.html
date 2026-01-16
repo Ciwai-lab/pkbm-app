@@ -7,7 +7,7 @@
     <title>Management Panel - PKBM Ciwai</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -54,6 +54,7 @@
                 <span class="w-2 h-8 bg-blue-600 rounded-full"></span> Tugas Utama Tutor
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+
                 <div class="menu-card bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 cursor-pointer border-b-4 border-blue-500 hover:shadow-xl transition-all"
                     onclick="bukaFormMateri()">
                     <div
@@ -191,31 +192,30 @@
 
     <script>
         fetch('/api/user-info').then(res => res.json()).then(user => {
-            const role = user.role; // 'admin' atau 'tutor'
+            const role = user.role.toLowerCase(); // Pastiin huruf kecil semua bro
             const detailEl = document.getElementById('user-detail');
             const titleEl = document.getElementById('dashboard-title');
             const namaTampil = user.full_name || user.username;
 
             detailEl.innerText = `${role.toUpperCase()} : ${namaTampil}`;
-            if (role === 'mentor' || role === 'tutor') {
+
+            if (role === 'mentor' || role === 'tutor' || role === 'admin') {
                 document.getElementById('section-tutor').classList.remove('hidden');
-                titleEl.innerText = "Tutor Dashboard";
+                titleEl.innerText = (role === 'admin') ? "Super Admin Panel" : "Tutor Dashboard";
                 document.getElementById('role-icon').className = "fa-solid fa-chalkboard-user text-xl";
+
                 loadDaftarMateriMentor();
                 loadSiswaMentor();
             }
-            else if (role === 'admin') {
-                document.getElementById('section-tutor').classList.remove('hidden');
+
+            if (role === 'admin') {
                 document.getElementById('section-admin').classList.remove('hidden');
-                titleEl.innerText = "Super Admin Panel";
-                loadSiswaMentor();
             }
-            loadDaftarMateriMentor();
         });
 
         function bikinTutor() {
             const data = {
-                fullName: document.getElementById('tutor-name-input').value, // Ambil nama lengkap
+                fullName: document.getElementById('tutor-name-input').value,
                 username: document.getElementById('tutor-user').value,
                 password: document.getElementById('tutor-pass').value,
                 program: document.getElementById('tutor-paket').value
@@ -255,12 +255,6 @@
                 </tr>
             `).join('');
                 });
-        }
-
-        // Panggil fungsi ini pas dashboard ke-load
-        // Tambahin di dalam fetch('/api/user-info') yang tadi
-        if (role === 'mentor') {
-            loadSiswaMentor();
         }
 
         function bukaFormMateri() {
