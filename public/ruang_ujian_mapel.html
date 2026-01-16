@@ -4,103 +4,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Ujian - PKBM Ciwai</title>
-    <link rel="stylesheet" href="/assets/style.css">
+    <title>Ruang Ujian - PKBM Ciwai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .mapel-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 20px;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #fff5f5;
         }
 
-        .mapel-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            border-left: 8px solid #ef4444;
-            /* Warna Ruang Ujian */
+        .ujian-card {
+            transition: all 0.3s ease;
         }
 
-        .btn-mulai {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: #ef4444;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            margin-top: 15px;
-            font-weight: bold;
+        .ujian-card:hover {
+            transform: scale(1.02);
+        }
+
+        .gradient-exam {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
         }
     </style>
 </head>
 
-<body class="home-page">
-    <div class="topbar">
-        <button onclick="location.href='/dashboard'">⬅ Kembali ke Dashboard</button>
-        <span>Ruang Ujian Aktif</span>
-    </div>
-
-    <div class="container">
-        <div class="mapel-grid">
-            <div class="mapel-card">
-                <h3>🇬🇧 Bahasa Inggris</h3>
-                <p style="font-size: 13px; color: #666;">Durasi: 60 Menit</p>
-                <p style="font-size: 13px; color: #666;">Status: Terbuka</p>
-                <a href="/inggris.html" class="btn-mulai">Mulai Ujian</a>
+<body class="pb-10">
+    <nav class="gradient-exam text-white p-5 shadow-lg rounded-b-[30px] mb-8 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="location.href='/dashboard'"
+                    class="bg-white/20 hover:bg-white/40 p-2 rounded-xl transition-all">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+                <div>
+                    <h1 id="label-paket" class="font-bold text-lg leading-tight">Ruang Ujian</h1>
+                    <p class="text-[10px] text-red-100 uppercase tracking-widest font-semibold">Evaluasi Mandiri</p>
+                </div>
             </div>
+            <div class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold border border-white/30">
+                LIVE STATUS
+            </div>
+        </div>
+    </nav>
 
-            <div class="mapel-card">
-                <h3>🧮 Matematika</h3>
-                <p style="font-size: 13px; color: #666;">Durasi: 90 Menit</p>
-                <p style="font-size: 13px; color: #666;">Status: Belum Dibuka</p>
-                <a href="#" class="btn-mulai" style="background:#ccc; cursor:not-allowed;">Belum Tersedia</a>
+    <div class="container mx-auto px-4">
+        <div class="mb-8 flex items-center gap-4 bg-white p-6 rounded-3xl shadow-sm border-l-8 border-red-600">
+            <div class="text-3xl text-red-600"><i class="fa-solid fa-file-pen"></i></div>
+            <div>
+                <h2 id="judul-halaman" class="text-xl font-black text-slate-800 tracking-tight">Daftar Ujian Aktif</h2>
+                <p class="text-slate-400 text-xs">Pastikan koneksi internet ente stabil sebelum mulai bro!</p>
+            </div>
+        </div>
+
+        <div id="mapel-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="col-span-full text-center py-20">
+                <i class="fa-solid fa-circle-notch fa-spin text-red-500 text-3xl mb-3"></i>
+                <p class="text-slate-400">Menyiapkan lembar soal...</p>
             </div>
         </div>
     </div>
+
     <script>
-        // Data Daftar Ujian per Paket
         const daftarUjian = {
             "Paket C": [
-                { mapel: "Bahasa Inggris", link: "/inggris.html", durasi: "60 Menit" },
-                { mapel: "Ekonomi", link: "/ekonomi.html", durasi: "90 Menit" }
+                { mapel: "Bahasa Inggris", icon: "fa-language", color: "red", durasi: "60 Menit", link: "/inggris.html" },
+                { mapel: "Ekonomi", icon: "fa-chart-line", color: "red", durasi: "90 Menit", link: "/ekonomi.html" }
             ],
             "Paket B": [
-                { mapel: "Matematika B", link: "/mtk-b.html", durasi: "90 Menit" }
+                { mapel: "Matematika B", icon: "fa-calculator", color: "red", durasi: "90 Menit", link: "/mtk-b.html" }
             ],
             "Paket A": [
-                { mapel: "IPA A", link: "/ipa-a.html", durasi: "45 Menit" }
+                { mapel: "IPA A", icon: "fa-microscope", color: "red", durasi: "45 Menit", link: "/ipa-a.html" }
             ]
         };
 
         fetch('/api/user-info')
             .then(res => res.json())
             .then(user => {
-                const paket = user.program; // Ambil info Paket A/B/C dari session
-                document.querySelector('.topbar span').innerText = `Ruang Ujian ${paket}`;
+                const paket = user.program || "Paket C";
+                document.getElementById('label-paket').innerText = `Ujian ${paket}`;
 
-                const grid = document.querySelector('.mapel-grid');
-                grid.innerHTML = ""; // Bersihin contoh yang tadi
+                const grid = document.getElementById('mapel-grid');
+                grid.innerHTML = "";
 
                 const ujianTersedia = daftarUjian[paket] || [];
 
                 if (ujianTersedia.length === 0) {
-                    grid.innerHTML = "<p>Belum ada jadwal ujian buat paket ente bro.</p>";
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center p-10 bg-white rounded-3xl border-2 border-dashed">
+                            <i class="fa-solid fa-mug-hot text-slate-300 text-4xl mb-4"></i>
+                            <p class="text-slate-500">Santai dulu bro, belum ada jadwal ujian buat ente.</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 ujianTersedia.forEach(u => {
                     const card = `
-                    <div class="mapel-card">
-                        <h3>${u.mapel}</h3>
-                        <p style="font-size: 13px; color: #666;">Durasi: ${u.durasi}</p>
-                        <a href="${u.link}" class="btn-mulai">Mulai Ujian</a>
-                    </div>
-                `;
+                        <div class="ujian-card bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 flex flex-col justify-between">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center text-2xl">
+                                    <i class="fa-solid ${u.icon}"></i>
+                                </div>
+                                <span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full uppercase">
+                                    <i class="fa-regular fa-clock mr-1"></i> ${u.durasi}
+                                </span>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-slate-800">${u.mapel}</h3>
+                                <p class="text-xs text-slate-400 mt-1">Selesaikan semua soal dengan teliti.</p>
+                            </div>
+
+                            <a href="${u.link}" class="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl text-center font-black tracking-wide shadow-lg shadow-red-200 transition-all active:scale-95">
+                                MULAI UJIAN SEKARANG
+                            </a>
+                        </div>
+                    `;
                     grid.innerHTML += card;
                 });
             });

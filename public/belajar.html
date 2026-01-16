@@ -5,81 +5,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ruang Belajar - PKBM Ciwai</title>
-    <link rel="stylesheet" href="/assets/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .modul-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 20px;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
         }
 
         .modul-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            border-bottom: 5px solid #3b82f6;
-            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .modul-card:hover {
-            background: #f8fafc;
+            transform: translateY(-10px);
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
         }
     </style>
 </head>
 
-<body class="home-page">
-    <div class="topbar">
-        <button onclick="location.href='/dashboard'">⬅ Balik ke Dashboard</button>
-        <span id="label-paket">Memuat materi...</span>
-    </div>
+<body class="pb-10">
+    <nav class="gradient-header text-white p-5 shadow-lg rounded-b-[30px] mb-8 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="location.href='/dashboard'"
+                    class="bg-white/20 hover:bg-white/40 p-2 rounded-xl transition-all">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+                <div>
+                    <h1 id="label-paket" class="font-bold text-lg leading-tight text-white">Ruang Belajar</h1>
+                    <p class="text-[10px] text-blue-100 uppercase tracking-widest font-semibold">Materi Terupdate</p>
+                </div>
+            </div>
+            <img src="/CiwAI-Toga-Transparant.webp" alt="Logo"
+                class="w-10 bg-white rounded-full p-1 border-2 border-white/50 shadow-md">
+        </div>
+    </nav>
 
-    <div class="container">
-        <h2 id="judul-halaman">📖 Modul Pembelajaran</h2>
-        <div id="daftar-modul" class="modul-grid">
+    <div class="container mx-auto px-4">
+        <div class="mb-8 flex items-end justify-between px-2">
+            <div>
+                <h2 id="judul-halaman" class="text-2xl font-black text-slate-800 tracking-tight">📖 Modul Pembelajaran
+                </h2>
+                <p class="text-slate-400 text-xs">Akses semua materi paket ente di bawah ini bro!</p>
+            </div>
+            <span
+                class="bg-blue-100 text-blue-600 text-[10px] px-3 py-1 rounded-full font-bold border border-blue-200 uppercase">Perpustakaan
+                Digital</span>
+        </div>
+
+        <div id="daftar-modul" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full text-center py-20">
+                <i class="fa-solid fa-spinner fa-spin text-blue-500 text-3xl mb-3"></i>
+                <p class="text-slate-400 animate-pulse">Lagi nyari modul buat ente bro...</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Data Modul (Bisa ente pindahin ke Database nanti bro!)
         const dataMateri = {
             "Paket C": [
-                { mapel: "Bahasa Inggris", link: "https://link-modul-inggris-c.pdf" },
-                { mapel: "Ekonomi", link: "https://link-modul-ekonomi-c.pdf" },
-                { mapel: "Sosiologi", link: "https://link-modul-sosiologi-c.pdf" }
+                { mapel: "Bahasa Inggris", icon: "fa-language", color: "blue" },
+                { mapel: "Ekonomi", icon: "fa-chart-line", color: "emerald" },
+                { mapel: "Sosiologi", icon: "fa-users", color: "purple" },
+                { mapel: "Geografi", icon: "fa-earth-asia", color: "orange" }
             ],
             "Paket B": [
-                { mapel: "Matematika", link: "https://link-modul-mtk-b.pdf" },
-                { mapel: "IPA", link: "https://link-modul-ipa-b.pdf" }
+                { mapel: "Matematika", icon: "fa-calculator", color: "red" },
+                { mapel: "IPA", icon: "fa-microscope", color: "cyan" },
+                { mapel: "IPS", icon: "fa-people-group", color: "amber" }
             ],
             "Paket A": [
-                { mapel: "Calistung", link: "https://link-modul-calistung-a.pdf" }
+                { mapel: "Calistung", icon: "fa-pen-clip", color: "pink" },
+                { mapel: "PKn", icon: "fa-flag", color: "red" }
             ]
         };
 
         fetch('/api/user-info')
             .then(res => res.json())
             .then(user => {
-                const paket = user.program; // Misal: "Paket C"
-                document.getElementById('label-paket').innerText = `Ruang Belajar ${paket}`;
+                const paket = user.program || "Paket C";
+                document.getElementById('label-paket').innerText = `Belajar ${paket}`;
                 document.getElementById('judul-halaman').innerText = `📖 Materi ${paket}`;
 
                 const listDiv = document.getElementById('daftar-modul');
                 const materiSesuai = dataMateri[paket] || [];
 
                 if (materiSesuai.length === 0) {
-                    listDiv.innerHTML = "<p>Materi belum tersedia buat paket ente bro.</p>";
+                    listDiv.innerHTML = `
+                        <div class="col-span-full bg-white p-10 rounded-3xl text-center border-2 border-dashed border-slate-200">
+                            <p class="text-slate-500 font-medium text-sm">Waduh, materi belum diupload admin bro! Coba tagih wkwk.</p>
+                        </div>
+                    `;
                     return;
                 }
 
+                listDiv.innerHTML = '';
                 materiSesuai.forEach(item => {
                     const card = `
-                        <div class="modul-card" onclick="window.open('${item.link}', '_blank')">
-                            <span style="font-size:30px;">📗</span>
-                            <h3>${item.mapel}</h3>
-                            <p style="font-size:12px; color:blue;">Klik buat buka PDF</p>
+                        <div class="modul-card group bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 cursor-pointer hover:shadow-xl hover:border-blue-200" 
+                             onclick="window.open('https://link-modul-contoh.pdf', '_blank')">
+                            <div class="flex items-center gap-5">
+                                <div class="w-16 h-16 bg-${item.color}-100 text-${item.color}-600 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-${item.color}-600 group-hover:text-white transition-all duration-300">
+                                    <i class="fa-solid ${item.icon}"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">${item.mapel}</h3>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded uppercase font-bold tracking-tighter">Modul PDF</span>
+                                        <i class="fa-solid fa-circle-check text-blue-500 text-[10px]"></i>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all"></i>
+                            </div>
                         </div>
                     `;
                     listDiv.innerHTML += card;

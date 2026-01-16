@@ -61,7 +61,7 @@ app.post('/login', (req, res) => {
     db.get(`SELECT * FROM registrations WHERE reg_number = ? AND (password = ? OR (password IS NULL AND reg_number = ?)) AND status = 'approved'`,
       [username, password, password], (err, siswa) => {
         if (err || !siswa) return res.send("<script>alert('Login Gagal!'); window.location='/login';</script>");
-        req.session.user = { id: siswa.id, username: siswa.name, role: 'siswa', reg_number: siswa.reg_number, program: siswa.program };
+        req.session.user = { id: siswa.id, name: siswa.name, role: 'siswa', reg_number: siswa.reg_number, program: siswa.program };
         res.redirect('/dashboard');
       });
   });
@@ -77,8 +77,9 @@ app.get('/api/discussions', isSiswa, (req, res) => {
 
 app.post('/api/discussions', isSiswa, (req, res) => {
   const { message } = req.body;
-  const { username, program, id } = req.session.user;
-  db.run(`INSERT INTO discussions (user_id, username, program, message) VALUES (?, ?, ?, ?)`, [id, username, program, message], () => res.json({ status: 'success' }));
+  const { id, name, program } = req.session.user;
+  db.run(`INSERT INTO discussions (user_id, username, program, message) VALUES (?, ?, ?, ?)`,
+    [id, name, program, message], () => res.json({ status: 'success' }));
 });
 
 // --- Pendaftaran & Admin API ---
