@@ -54,7 +54,6 @@
                 <span class="w-2 h-8 bg-blue-600 rounded-full"></span> Tugas Utama Tutor
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-
                 <div class="menu-card bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 cursor-pointer border-b-4 border-blue-500 hover:shadow-xl transition-all"
                     onclick="bukaFormMateri()">
                     <div
@@ -64,30 +63,8 @@
                     <h3 class="font-bold text-slate-800">Input Modul & Ujian</h3>
                     <p class="text-[10px] text-slate-400 uppercase tracking-wider">Update PDF & Google Form</p>
                 </div>
-
-                <div id="modal-materi"
-                    class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-                    <div class="bg-white rounded-[30px] p-8 w-full max-w-md">
-                        <h3 class="font-bold text-xl mb-4 text-slate-800">Update Materi & Ujian</h3>
-                        <div class="space-y-4">
-                            <input type="text" id="mat-subject" placeholder="Nama Mapel (Contoh: Matematika)"
-                                class="w-full bg-slate-50 border-none rounded-xl px-4 py-3">
-                            <input type="text" id="mat-module" placeholder="Link PDF Modul"
-                                class="w-full bg-slate-50 border-none rounded-xl px-4 py-3">
-                            <input type="text" id="mat-exam" placeholder="Link Google Form Ujian"
-                                class="w-full bg-slate-50 border-none rounded-xl px-4 py-3">
-                            <div class="flex gap-2 pt-2">
-                                <button onclick="simpanMateri()"
-                                    class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Simpan</button>
-                                <button onclick="document.getElementById('modal-materi').classList.add('hidden')"
-                                    class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl">Batal</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="menu-card bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 cursor-pointer border-b-4 border-emerald-500"
-                    onclick="alert('Fitur Input Nilai')">
+                    onclick="alert('Fitur Input Nilai Segera Hadir!')">
                     <div
                         class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-4">
                         <i class="fa-solid fa-star"></i>
@@ -95,7 +72,6 @@
                     <h3 class="font-bold text-slate-800">Rekap Nilai</h3>
                     <p class="text-xs text-slate-400">Pantau dan input hasil belajar warga</p>
                 </div>
-
                 <div class="menu-card bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 cursor-pointer border-b-4 border-purple-500"
                     onclick="location.href='/forum'">
                     <div
@@ -106,10 +82,10 @@
                     <p class="text-xs text-slate-400">Masuk ke ruang chat paket ente</p>
                 </div>
             </div>
-            <div class="mt-8 bg-white p-6 rounded-[30px] shadow-sm border border-slate-100">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">
-                    <i class="fa-solid fa-users text-blue-600 mr-2"></i> Daftar Siswa Anda
-                </h3>
+
+            <div class="mt-8 bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 mb-8">
+                <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-users text-blue-600 mr-2"></i>
+                    Daftar Siswa Anda</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
@@ -119,8 +95,7 @@
                                 <th class="pb-3 font-medium">Program</th>
                             </tr>
                         </thead>
-                        <tbody id="tabel-siswa-mentor" class="text-slate-600 text-sm">
-                        </tbody>
+                        <tbody id="tabel-siswa-mentor" class="text-slate-600 text-sm"></tbody>
                     </table>
                 </div>
             </div>
@@ -128,9 +103,7 @@
 
         <div class="mt-8 bg-white p-6 rounded-[30px] shadow-sm border border-slate-100">
             <div class="flex items-center gap-3 mb-6">
-                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
-                    <i class="fa-solid fa-box-archive"></i>
-                </div>
+                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-box-archive"></i></div>
                 <h3 class="font-bold text-slate-800">Daftar Modul & Ujian Aktif</h3>
             </div>
             <div class="overflow-x-auto">
@@ -140,78 +113,248 @@
                             <th class="pb-3 font-semibold">Mapel</th>
                             <th class="pb-3 font-semibold">Program</th>
                             <th class="pb-3 font-semibold">Link</th>
-                            <th class="pb-3 font-semibold">Aksi</th>
+                            <th class="pb-3 font-semibold text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="tabel-materi-mentor">
-                    </tbody>
+                    <tbody id="tabel-materi-mentor"></tbody>
                 </table>
             </div>
         </div>
 
-        <div id="section-admin" class="hidden mt-10">
+        <div id="section-admin" class="hidden mt-10 pt-10 border-t-2 border-dashed border-slate-200">
             <h2 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
                 <span class="w-2 h-8 bg-red-600 rounded-full"></span> Kendali Pusat Admin
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-[25px] shadow-sm border border-red-100 cursor-pointer hover:bg-red-50"
-                    onclick="alert('Data Siswa Pusat')">
+                    onclick="showDataInduk()">
                     <i class="fa-solid fa-id-card text-red-600 mb-2"></i>
-                    <h4 class="font-bold text-slate-800">Data Induk</h4>
+                    <h4 class="font-bold text-slate-800">Data Induk Siswa</h4>
                 </div>
                 <div class="bg-white p-6 rounded-[25px] shadow-sm border border-red-100 cursor-pointer hover:bg-red-50"
-                    onclick="alert('Kelola Akun Tutor')">
+                    onclick="showKelolaTutor()">
                     <i class="fa-solid fa-chalkboard-user text-red-600 mb-2"></i>
-                    <h4 class="font-bold text-slate-800">Kelola Tutor</h4>
+                    <h4 class="font-bold text-slate-800">Kelola Akun Tutor</h4>
                 </div>
             </div>
-            <div class="bg-white p-8 rounded-[30px] shadow-sm border border-red-100 mt-6">
+
+            <div class="bg-white p-8 rounded-[30px] shadow-sm border border-red-100">
                 <h3 class="font-bold text-slate-800 mb-4"><i class="fa-solid fa-user-plus text-red-600 mr-2"></i> Tambah
                     Akun Tutor Baru</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4"> <input type="text" id="tutor-name-input"
-                        placeholder="Nama Lengkap Tutor"
-                        class="bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <input type="text" id="tutor-name-input" placeholder="Nama Lengkap"
+                        class="bg-slate-50 border-none rounded-xl px-4 py-3 text-sm">
                     <input type="text" id="tutor-user" placeholder="Username"
-                        class="bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500">
+                        class="bg-slate-50 border-none rounded-xl px-4 py-3 text-sm">
                     <input type="password" id="tutor-pass" placeholder="Password"
-                        class="bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500">
-                    <select id="tutor-paket"
-                        class="bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500">
+                        class="bg-slate-50 border-none rounded-xl px-4 py-3 text-sm">
+                    <select id="tutor-paket" class="bg-slate-50 border-none rounded-xl px-4 py-3 text-sm">
                         <option value="Paket A">Paket A</option>
                         <option value="Paket B">Paket B</option>
                         <option value="Paket C">Paket C</option>
                     </select>
                 </div>
                 <button onclick="bikinTutor()"
-                    class="mt-4 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold transition-all active:scale-95">
-                    Daftarkan Tutor
-                </button>
+                    class="mt-4 bg-red-600 text-white px-6 py-3 rounded-xl font-bold">Daftarkan Tutor</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-materi" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-[30px] p-8 w-full max-w-md">
+            <h3 class="font-bold text-xl mb-4 text-slate-800">Update Materi & Ujian</h3>
+            <div class="space-y-4">
+                <input type="text" id="mat-subject" placeholder="Nama Mapel"
+                    class="w-full bg-slate-50 border-none rounded-xl px-4 py-3">
+                <input type="text" id="mat-module" placeholder="Link PDF Modul"
+                    class="w-full bg-slate-50 border-none rounded-xl px-4 py-3">
+                <input type="text" id="mat-exam" placeholder="Link Google Form Ujian"
+                    class="w-full bg-slate-50 border-none rounded-xl px-4 py-3">
+                <div class="flex gap-2 pt-2">
+                    <button onclick="simpanMateri()"
+                        class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Simpan</button>
+                    <button onclick="document.getElementById('modal-materi').classList.add('hidden')"
+                        class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-admin-list" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-[110] p-4">
+        <div class="bg-white rounded-[30px] p-8 w-full max-w-4xl max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modal-admin-title" class="font-bold text-xl text-slate-800">Data</h3>
+                <button onclick="document.getElementById('modal-admin-list').classList.add('hidden')"
+                    class="text-slate-400 hover:text-red-500 text-2xl">&times;</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead id="modal-admin-thead" class="text-sm text-slate-400 border-b"></thead>
+                    <tbody id="modal-admin-tbody" class="text-sm text-slate-600"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-siswa" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[120] p-4">
+        <div class="bg-white rounded-[30px] p-8 w-full max-w-md shadow-2xl">
+            <h3 class="font-bold text-xl mb-6 text-slate-800">Edit Data Siswa</h3>
+            <input type="hidden" id="edit-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 font-bold ml-1 uppercase">Nama Lengkap</label>
+                    <input type="text" id="edit-name" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 font-bold ml-1 uppercase">Program/Paket</label>
+                    <select id="edit-program" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 mt-1">
+                        <option value="Paket A">Paket A</option>
+                        <option value="Paket B">Paket B</option>
+                        <option value="Paket C">Paket C</option>
+                    </select>
+                </div>
+                <div class="flex gap-2 mt-6">
+                    <button onclick="simpanPerubahanSiswa()"
+                        class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Simpan</button>
+                    <button onclick="document.getElementById('modal-edit-siswa').classList.add('hidden')"
+                        class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl">Batal</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // 1. Inisialisasi User Info & Role
         fetch('/api/user-info').then(res => res.json()).then(user => {
-            const role = user.role.toLowerCase(); // Pastiin huruf kecil semua bro
-            const detailEl = document.getElementById('user-detail');
-            const titleEl = document.getElementById('dashboard-title');
-            const namaTampil = user.full_name || user.username;
-
-            detailEl.innerText = `${role.toUpperCase()} : ${namaTampil}`;
+            const role = user.role.toLowerCase();
+            document.getElementById('user-detail').innerText = `${role.toUpperCase()} : ${user.full_name || user.username}`;
 
             if (role === 'mentor' || role === 'tutor' || role === 'admin') {
                 document.getElementById('section-tutor').classList.remove('hidden');
-                titleEl.innerText = (role === 'admin') ? "Super Admin Panel" : "Tutor Dashboard";
+                document.getElementById('dashboard-title').innerText = (role === 'admin') ? "Super Admin Panel" : "Tutor Dashboard";
                 document.getElementById('role-icon').className = "fa-solid fa-chalkboard-user text-xl";
-
                 loadDaftarMateriMentor();
                 loadSiswaMentor();
             }
-
-            if (role === 'admin') {
-                document.getElementById('section-admin').classList.remove('hidden');
-            }
+            if (role === 'admin') document.getElementById('section-admin').classList.remove('hidden');
         });
+
+        // 2. Fungsi Load Data
+        function loadSiswaMentor() {
+            fetch('/api/mentor/siswa').then(res => res.json()).then(data => {
+                document.getElementById('tabel-siswa-mentor').innerHTML = data.map(s => `
+                    <tr class="border-b hover:bg-slate-50 transition-all">
+                        <td class="py-4 font-semibold text-slate-800">${s.name}</td>
+                        <td class="py-4">${s.reg_number}</td>
+                        <td class="py-4"><span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">${s.program}</span></td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        function loadDaftarMateriMentor() {
+            fetch('/api/student/materials').then(res => res.json()).then(data => {
+                const tbody = document.getElementById('tabel-materi-mentor');
+                tbody.innerHTML = data.map(m => `
+                    <tr class="border-b">
+                        <td class="py-4">${m.subject}</td>
+                        <td class="py-4">${m.program}</td>
+                        <td class="py-4"><a href="${m.module_link}" target="_blank" class="text-blue-500 font-bold">Link Modul</a></td>
+                        <td class="py-4 text-right">
+                            <button onclick="hapusMateri(${m.id})" class="text-red-500 hover:bg-red-50 p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        // 3. Fungsi Admin (CRUD)
+        function showDataInduk() {
+            const modal = document.getElementById('modal-admin-list');
+            document.getElementById('modal-admin-title').innerText = "Data Induk Seluruh Siswa";
+            document.getElementById('modal-admin-thead').innerHTML = `<tr><th class="pb-3">Nama</th><th class="pb-3">Program</th><th class="pb-3 text-right">Aksi</th></tr>`;
+            fetch('/api/admin/semua-siswa').then(res => res.json()).then(data => {
+                document.getElementById('modal-admin-tbody').innerHTML = data.map(s => `
+                    <tr class="border-b">
+                        <td class="py-3 font-medium">${s.name}</td>
+                        <td class="py-3">${s.program}</td>
+                        <td class="py-3 text-right space-x-2">
+                            <button onclick="bukaEditSiswa(${s.id})" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="hapusSiswa(${s.id})" class="text-red-500 hover:bg-red-50 p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+                modal.classList.remove('hidden');
+            });
+        }
+
+        function showKelolaTutor() {
+            const modal = document.getElementById('modal-admin-list');
+            document.getElementById('modal-admin-title').innerText = "Daftar Akun Tutor/Mentor";
+            document.getElementById('modal-admin-thead').innerHTML = `<tr><th class="pb-3">Nama</th><th class="pb-3">Paket</th><th class="pb-3 text-right">Aksi</th></tr>`;
+            fetch('/api/admin/daftar-tutor').then(res => res.json()).then(data => {
+                document.getElementById('modal-admin-tbody').innerHTML = data.map(t => `
+                    <tr class="border-b">
+                        <td class="py-3 font-bold">${t.full_name || t.username}</td>
+                        <td class="py-3">${t.program}</td>
+                        <td class="py-3 text-right">
+                            <button onclick="hapusTutor(${t.id})" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-user-minus"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+                modal.classList.remove('hidden');
+            });
+        }
+
+        // 4. Fungsi Edit & Simpan
+        function bukaEditSiswa(id) {
+            fetch(`/api/admin/siswa/${id}`).then(res => res.json()).then(s => {
+                document.getElementById('edit-id').value = s.id;
+                document.getElementById('edit-name').value = s.name;
+                document.getElementById('edit-program').value = s.program;
+                document.getElementById('modal-edit-siswa').classList.remove('hidden');
+            });
+        }
+
+        function simpanPerubahanSiswa() {
+            const data = {
+                id: document.getElementById('edit-id').value,
+                name: document.getElementById('edit-name').value,
+                program: document.getElementById('edit-program').value
+            };
+            fetch('/api/admin/siswa/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(res => res.json()).then(res => {
+                alert(res.message);
+                document.getElementById('modal-edit-siswa').classList.add('hidden');
+                showDataInduk();
+            });
+        }
+
+        // 5. Fungsi Delete & Other
+        function hapusSiswa(id) { if (confirm('Hapus siswa ini?')) fetch(`/api/admin/siswa/${id}`, { method: 'DELETE' }).then(() => showDataInduk()); }
+        function hapusTutor(id) { if (confirm('Pecat tutor ini?')) fetch(`/api/admin/tutor/${id}`, { method: 'DELETE' }).then(() => showKelolaTutor()); }
+        function hapusMateri(id) { if (confirm('Hapus materi ini?')) fetch(`/api/materials/${id}`, { method: 'DELETE' }).then(() => loadDaftarMateriMentor()); }
+        function bukaFormMateri() { document.getElementById('modal-materi').classList.remove('hidden'); }
+
+        function simpanMateri() {
+            const data = {
+                subject: document.getElementById('mat-subject').value,
+                module_link: document.getElementById('mat-module').value,
+                exam_link: document.getElementById('mat-exam').value
+            };
+            fetch('/api/save-material', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(res => res.json()).then(res => {
+                alert(res.message);
+                document.getElementById('modal-materi').classList.add('hidden');
+                loadDaftarMateriMentor();
+            });
+        }
 
         function bikinTutor() {
             const data = {
@@ -220,102 +363,11 @@
                 password: document.getElementById('tutor-pass').value,
                 program: document.getElementById('tutor-paket').value
             };
-
             fetch('/api/create-tutor', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                credentials: 'include'
-            })
-                .then(res => {
-                    if (!res.ok) {
-                        return res.json().then(err => { throw new Error(err.message) });
-                    }
-                    return res.json();
-                })
-                .then(res => {
-                    alert(res.message);
-                    location.reload();
-                })
-                .catch(err => {
-                    alert("Waduh: " + err.message);
-                });
-        }
-
-        function loadSiswaMentor() {
-            fetch('/api/mentor/siswa', { credentials: 'include' })
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById('tabel-siswa-mentor');
-                    container.innerHTML = data.map(s => `
-                <tr class="border-b hover:bg-slate-50 transition-all">
-                    <td class="py-4 font-semibold text-slate-800">${s.name}</td>
-                    <td class="py-4">${s.reg_number}</td>
-                    <td class="py-4"><span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">${s.program}</span></td>
-                </tr>
-            `).join('');
-                });
-        }
-
-        function bukaFormMateri() {
-            document.getElementById('modal-materi').classList.remove('hidden');
-        }
-
-        // Fungsi kirim data ke server
-        function simpanMateri() {
-            const data = {
-                subject: document.getElementById('mat-subject').value,
-                module_link: document.getElementById('mat-module').value,
-                exam_link: document.getElementById('mat-exam').value
-            };
-
-            fetch('/api/save-material', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                credentials: 'include'
-            }).then(res => res.json()).then(res => {
-                alert(res.message);
-                document.getElementById('modal-materi').classList.add('hidden');
-            });
-        }
-
-        // Fungsi buat ambil data materi (Daftar Modul)
-        function loadDaftarMateriMentor() {
-            fetch('/api/student/materials')
-                .then(res => {
-                    if (!res.ok) throw new Error('Gagal narik data');
-                    return res.json();
-                })
-                .then(data => {
-                    const tbody = document.getElementById('tabel-materi-mentor');
-                    if (data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Kosong, Bro!</td></tr>';
-                        return;
-                    }
-                    tbody.innerHTML = data.map(m => `
-                <tr class="border-b">
-                    <td class="py-4">${m.subject}</td>
-                    <td class="py-4">${m.program}</td>
-                    <td class="py-4"><a href="${m.module_link}" target="_blank" class="text-blue-500">Buka</a></td>
-                    <td class="py-4"><button onclick="hapusMateri(${m.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `).join('');
-                })
-                .catch(err => console.error("Error tampil materi:", err));
-        }
-
-        // Fungsi Hapus dengan konfirmasi
-        function hapusMateri(id) {
-            if (confirm('Yakin mau hapus materi ini, Bro?')) {
-                fetch(`/api/materials/${id}`, { method: 'DELETE' })
-                    .then(res => res.json())
-                    .then(result => {
-                        alert(result.message);
-                        loadDaftarMateriMentor(); // Otomatis Refresh tabel
-                    })
-                    .catch(err => alert('Gagal hapus materi!'));
-            }
+                body: JSON.stringify(data)
+            }).then(res => res.json()).then(res => { alert(res.message); location.reload(); });
         }
     </script>
 </body>

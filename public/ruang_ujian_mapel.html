@@ -71,7 +71,6 @@
                 const paket = user.program || "Paket Belajar";
                 document.getElementById('label-paket').innerText = `Ujian ${paket}`;
 
-                // Panggil data ujian asli dari database
                 loadUjianSiswa();
             });
 
@@ -81,7 +80,6 @@
                 .then(data => {
                     const grid = document.getElementById('mapel-grid');
 
-                    // Filter materi yang ada link ujiannya aja
                     const listUjian = data.filter(m => m.exam_link && m.exam_link !== "#");
 
                     if (listUjian.length === 0) {

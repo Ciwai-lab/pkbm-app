@@ -13,7 +13,6 @@
 
         .active-step {
             border-bottom: 4px solid #6610f2;
-            /* Warna ungu Ciwai */
             color: #6610f2;
         }
     </style>
@@ -380,12 +379,12 @@
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json(); // Ambil data JSON dari server
+                const result = await response.json();
 
                 if (response.ok && result.success) {
                     window.location.href = '/sukses';
                 } else {
-                    // Tampilkan pesan error spesifik dari server
+
                     alert('Waduh Gagal Bro! Pesannya: ' + (result.error || 'Masalah Server'));
                     btn.innerText = "Coba Lagi";
                     btn.disabled = false;
